@@ -22,7 +22,7 @@ function App() {
 
       
       const weatherResponse = await fetch(
-        `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&hourly=temperature_2m,weathercode&timezone=auto`      );
+        `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&hourly=temperature_2m,weathercode,windspeed_10m,winddirection_10m&timezone=auto`      );
       const weatherData = await weatherResponse.json();
 
       setWeather(weatherData.hourly);
@@ -40,11 +40,17 @@ const todayHours = weather
         time,
         temp: weather.temperature_2m[index],
         code: weather.weathercode[index],
+        wind: weather.windspeed_10m[index],
+        dir: weather.winddirection_10m[index],
       }))
       .filter((hour) => hour.time.startsWith(today))
   : [];
   const convertTemp = (temp) => {
     const value = unit === "F" ? (temp * 9) / 5 + 32 : temp;
+    return value.toFixed(1);
+  };
+  const convertWind = (wind) => {
+    const value = unit === "F" ? wind * 0.621371 : wind;
     return value.toFixed(1);
   };
   const formatHour = (time) => {
@@ -62,6 +68,11 @@ const todayHours = weather
   if (code >= 95) return "⛈️";
   return "❓";
 };
+  const getWindDir = (deg) => {
+    const directions = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
+    const index = Math.round(deg / 22.5) % 16;
+    return directions[index];
+  };
   
   return (
   <div className="app">
@@ -90,6 +101,7 @@ const todayHours = weather
               <p>{formatHour(hour.time)}</p>
               <p>{convertTemp(hour.temp)}°{unit}</p>
               <span>{getWeatherIcon(hour.code)}</span>
+              <p>{convertWind(hour.wind)} {unit === 'C' ? 'km/h' : 'mph'} {getWindDir(hour.dir)}</p>
             </div>
           ))}
         </div>
