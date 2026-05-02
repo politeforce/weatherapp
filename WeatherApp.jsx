@@ -64,16 +64,22 @@ const todayHours = weather
     return (h % 12 || 12) + (h >= 12 ? "PM" : "AM");
   };
 
-  const getWeatherIcon = (code) => {
-  if (code === 0) return "☀️"; 
-  if (code <= 2) return "🌤️"; 
-  if (code === 3) return "☁️"; 
-  if (code >= 45 && code <= 48) return "🌫️"; 
-  if (code >= 51 && code <= 67) return "🌧️"; 
-  if (code >= 71 && code <= 77) return "❄️"; 
-  if (code >= 95) return "⛈️";
-  return "❓";
-};
+  const getWeatherIcon = (code, timeString = null) => {
+   
+    const isNight = timeString ? (() => {
+      const hour = new Date(timeString).getHours();
+      return hour >= 18 || hour < 6;
+    })() : false;
+    
+    if (code === 0) return isNight ? "🌙" : "☀️"; 
+    if (code <= 2) return isNight ? "☁️" : "🌤️"; 
+    if (code === 3) return "☁️"; 
+    if (code >= 45 && code <= 48) return "🌫️"; 
+    if (code >= 51 && code <= 67) return "🌧️"; 
+    if (code >= 71 && code <= 77) return "❄️"; 
+    if (code >= 95) return "⛈️"; 
+    return "❓";
+  };
   const getWindDir = (deg) => {
     const directions = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
     const index = Math.round(deg / 22.5) % 16;
@@ -116,7 +122,7 @@ const todayHours = weather
             <div key={i} className="hour">
               <p>{formatHour(hour.time)}</p>
               <p>{convertTemp(hour.temp)}°{unit}</p>
-              <span>{getWeatherIcon(hour.code)}</span>
+              <span>{getWeatherIcon(hour.code, hour.time)}</span>
               <p>{convertWind(hour.wind)} {unit === 'C' ? 'km/h' : 'mph'} {getWindDir(hour.dir)}</p>
               <p>Humidity: {hour.humidity}%</p>
               <p>Rain: {hour.prob}%</p>

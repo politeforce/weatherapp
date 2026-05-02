@@ -1,31 +1,30 @@
-
 body {
   margin: 0;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  font-family: Arial, sans-serif;
+  background: #4facfe;
+  color: white;
 }
 
 
 .app {
   height: 100vh;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
-  background: linear-gradient(135deg, #4facfe, #00f2fe);
+  justify-content: flex-start;
+  padding-top: 20px;
 }
 
 
 .card {
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(15px);
-  padding: 30px;
-  border-radius: 20px;
   width: 350px;
+  padding: 20px;
   text-align: center;
-  color: white;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
 }
 
+
 .title {
+  text-align: center;
   margin-bottom: 20px;
 }
 
@@ -39,61 +38,39 @@ body {
 .search input {
   flex: 1;
   padding: 10px;
-  border-radius: 10px;
   border: none;
-  outline: none;
+  border-radius: 5px;
 }
 
 .search button {
-  padding: 10px 15px;
+  padding: 10px;
   border: none;
-  border-radius: 10px;
-  background: #ffffff;
-  color: #333;
+  border-radius: 5px;
   cursor: pointer;
-  font-weight: bold;
-  transition: 0.2s;
 }
 
-.search button:hover {
-  background: #ddd;
-}
 
 .hourly {
   display: flex;
   overflow-x: auto;
   gap: 10px;
-  padding: 10px;
+  padding: 10px 0;
 }
 
 .hour {
   min-width: 70px;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 10px;
-  padding: 10px;
   text-align: center;
-  backdrop-filter: blur(5px);
-  transition: transform 0.2s;
 }
 
-.hour:hover {
-  transform: scale(1.1);
-}
-.weather {
-  margin-top: 10px;
+
+.temp {
+  font-size: 40px;
 }
 
 .city {
-  font-size: 22px;
-  margin-bottom: 5px;
-}
-
-.temp {
-  font-size: 48px;
-  margin: 10px 0;
+  font-size: 20px;
 }
 
 .wind {
   opacity: 0.8;
 }
-
