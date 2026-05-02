@@ -36,7 +36,17 @@ function App() {
     }
   };
 
-const today = new Date().toISOString().split("T")[0];
+const parseLocalDate = (dateString) => {
+  const [year, month, day] = dateString.split("-").map(Number);
+  return new Date(year, month - 1, day);
+};
+
+const getTodayForTimezone = (timezone) =>
+  new Date().toLocaleDateString("en-CA", { timeZone: timezone });
+
+const today = weather && weather.timezone
+  ? getTodayForTimezone(weather.timezone)
+  : new Date().toLocaleDateString("en-CA");
 
 const todayHours = weather
   ? weather.hourly.time
@@ -136,7 +146,7 @@ const todayHours = weather
           <h2>7-Day Forecast</h2>
           {weeklyDays.map((day, i) => (
             <div key={i} className="day">
-              <span className="day-name">{i === 0 ? 'Today' : new Date(day.time).toLocaleDateString('en-US', { weekday: 'short' })}</span>
+              <span className="day-name">{i === 0 ? 'Today' : parseLocalDate(day.time).toLocaleDateString('en-US', { weekday: 'short' })}</span>
               <span className="day-icon">{getWeatherIcon(day.code)}</span>
               <span className="day-temps">{convertTemp(day.min)}° - {convertTemp(day.max)}°</span>
             </div>
