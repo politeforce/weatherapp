@@ -1,10 +1,13 @@
 import { useState } from "react";
+import dayBg from "./DayTime.png";
+import nightBg from "./Nighttime.png";
 import "./WeatherApp.css";
 
 function App() {
   const [city, setCity] = useState("");
   const [weather, setWeather] = useState(null);
   const [unit, setUnit] = useState("C");
+  const [isDaytime, setIsDaytime] = useState(true);
 
   const getWeather = async () => {
     try {
@@ -22,10 +25,11 @@ function App() {
 
       
       const weatherResponse = await fetch(
-        `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&hourly=temperature_2m,weathercode,windspeed_10m,winddirection_10m,precipitation_probability,relativehumidity_2m&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=auto`      );
+        `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&hourly=temperature_2m,weathercode,windspeed_10m,winddirection_10m,precipitation_probability,relativehumidity_2m&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=auto`      );
       const weatherData = await weatherResponse.json();
 
       setWeather(weatherData);
+      setIsDaytime(weatherData.current_weather?.is_day === 1);
     } catch (error) {
       console.error(error);
       alert("Error fetching weather");
@@ -75,6 +79,10 @@ const todayHours = weather
     const index = Math.round(deg / 22.5) % 16;
     return directions[index];
   };
+  const appBackground = {
+    backgroundImage: `url(${isDaytime ? dayBg : nightBg})`,
+  };
+
   const weeklyDays = weather ? weather.daily.time.map((time, index) => ({
     time,
     max: weather.daily.temperature_2m_max[index],
@@ -83,7 +91,7 @@ const todayHours = weather
   })) : [];
   
   return (
-  <div className="app">
+  <div className="app" style={appBackground}>
     <div className="card">
       <h1 className="title">Weather App</h1>
 
@@ -119,7 +127,7 @@ const todayHours = weather
 
       {weather && (
         <div className="weekly">
-          <h2>10-Day Forecast</h2>
+          <h2>7-Day Forecast</h2>
           {weeklyDays.map((day, i) => (
             <div key={i} className="day">
               <span className="day-name">{i === 0 ? 'Today' : new Date(day.time).toLocaleDateString('en-US', { weekday: 'short' })}</span>
