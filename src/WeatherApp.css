@@ -1,0 +1,99 @@
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+
+.app {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #4facfe, #00f2fe);
+}
+
+
+.card {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(15px);
+  padding: 30px;
+  border-radius: 20px;
+  width: 350px;
+  text-align: center;
+  color: white;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.title {
+  margin-bottom: 20px;
+}
+
+
+.search {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.search input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 10px;
+  border: none;
+  outline: none;
+}
+
+.search button {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #333;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.2s;
+}
+
+.search button:hover {
+  background: #ddd;
+}
+
+.hourly {
+  display: flex;
+  overflow-x: auto;
+  gap: 10px;
+  padding: 10px;
+}
+
+.hour {
+  min-width: 70px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  padding: 10px;
+  text-align: center;
+  backdrop-filter: blur(5px);
+  transition: transform 0.2s;
+}
+
+.hour:hover {
+  transform: scale(1.1);
+}
+.weather {
+  margin-top: 10px;
+}
+
+.city {
+  font-size: 22px;
+  margin-bottom: 5px;
+}
+
+.temp {
+  font-size: 48px;
+  margin: 10px 0;
+}
+
+.wind {
+  opacity: 0.8;
+}
+
