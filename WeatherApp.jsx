@@ -22,10 +22,10 @@ function App() {
 
       
       const weatherResponse = await fetch(
-        `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&hourly=temperature_2m,weathercode,windspeed_10m,winddirection_10m&timezone=auto`      );
+        `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&hourly=temperature_2m,weathercode,windspeed_10m,winddirection_10m,precipitation_probability&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=auto`      );
       const weatherData = await weatherResponse.json();
 
-      setWeather(weatherData.hourly);
+      setWeather(weatherData);
     } catch (error) {
       console.error(error);
       alert("Error fetching weather");
@@ -35,13 +35,14 @@ function App() {
 const today = new Date().toISOString().split("T")[0];
 
 const todayHours = weather
-  ? weather.time
+  ? weather.hourly.time
       .map((time, index) => ({
         time,
-        temp: weather.temperature_2m[index],
-        code: weather.weathercode[index],
-        wind: weather.windspeed_10m[index],
-        dir: weather.winddirection_10m[index],
+        temp: weather.hourly.temperature_2m[index],
+        code: weather.hourly.weathercode[index],
+        wind: weather.hourly.windspeed_10m[index],
+        dir: weather.hourly.winddirection_10m[index],
+        prob: weather.hourly.precipitation_probability[index],
       }))
       .filter((hour) => hour.time.startsWith(today))
   : [];
@@ -73,6 +74,12 @@ const todayHours = weather
     const index = Math.round(deg / 22.5) % 16;
     return directions[index];
   };
+  const weeklyDays = weather ? weather.daily.time.map((time, index) => ({
+    time,
+    max: weather.daily.temperature_2m_max[index],
+    min: weather.daily.temperature_2m_min[index],
+    code: weather.daily.weathercode[index],
+  })) : [];
   
   return (
   <div className="app">
@@ -102,6 +109,20 @@ const todayHours = weather
               <p>{convertTemp(hour.temp)}°{unit}</p>
               <span>{getWeatherIcon(hour.code)}</span>
               <p>{convertWind(hour.wind)} {unit === 'C' ? 'km/h' : 'mph'} {getWindDir(hour.dir)}</p>
+              <p>Rain: {hour.prob}%</p>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {weather && (
+        <div className="weekly">
+          <h2>10-Day Forecast</h2>
+          {weeklyDays.map((day, i) => (
+            <div key={i} className="day">
+              <span className="day-name">{i === 0 ? 'Today' : new Date(day.time).toLocaleDateString('en-US', { weekday: 'short' })}</span>
+              <span className="day-icon">{getWeatherIcon(day.code)}</span>
+              <span className="day-temps">{convertTemp(day.min)}° - {convertTemp(day.max)}°</span>
             </div>
           ))}
         </div>
