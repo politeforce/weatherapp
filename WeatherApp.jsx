@@ -22,7 +22,7 @@ function App() {
 
       
       const weatherResponse = await fetch(
-        `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&hourly=temperature_2m,weathercode,windspeed_10m,winddirection_10m,precipitation_probability&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=auto`      );
+        `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&hourly=temperature_2m,weathercode,windspeed_10m,winddirection_10m,precipitation_probability,relativehumidity_2m&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=auto`      );
       const weatherData = await weatherResponse.json();
 
       setWeather(weatherData);
@@ -43,6 +43,7 @@ const todayHours = weather
         wind: weather.hourly.windspeed_10m[index],
         dir: weather.hourly.winddirection_10m[index],
         prob: weather.hourly.precipitation_probability[index],
+        humidity: weather.hourly.relativehumidity_2m[index],
       }))
       .filter((hour) => hour.time.startsWith(today))
   : [];
@@ -109,6 +110,7 @@ const todayHours = weather
               <p>{convertTemp(hour.temp)}°{unit}</p>
               <span>{getWeatherIcon(hour.code)}</span>
               <p>{convertWind(hour.wind)} {unit === 'C' ? 'km/h' : 'mph'} {getWindDir(hour.dir)}</p>
+              <p>Humidity: {hour.humidity}%</p>
               <p>Rain: {hour.prob}%</p>
             </div>
           ))}
