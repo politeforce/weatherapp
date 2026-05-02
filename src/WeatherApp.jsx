@@ -6,6 +6,7 @@ function App() {
   const [weather, setWeather] = useState(null);
   const [unit, setUnit] = useState("C");
 
+
   const getWeather = async () => {
     try {
       const locationResponse = await fetch(
@@ -52,21 +53,24 @@ const todayHours = weather
     return (h % 12 || 12) + (h >= 12 ? "PM" : "AM");
   };
 
-  const getWeatherIcon = (code) => {
-  if (code === 0) return "☀️"; 
-  if (code <= 2) return "🌤️"; 
-  if (code === 3) return "☁️"; 
-  if (code >= 45 && code <= 48) return "🌫️"; 
-  if (code >= 51 && code <= 67) return "🌧️"; 
-  if (code >= 71 && code <= 77) return "❄️"; 
-  if (code >= 95) return "⛈️";
-  return "❓";
-};
+  const getWeatherIcon = (code, time) => {
+    const hour = new Date(time).getHours();
+    const isNight = hour < 6 || hour > 18;
+    
+    if (code === 0) return isNight ? "🌙" : "☀️"; 
+    if (code <= 2) return isNight ? "☁️" : "🌤️"; 
+    if (code === 3) return "☁️"; 
+    if (code >= 45 && code <= 48) return "🌫️"; 
+    if (code >= 51 && code <= 67) return "🌧️"; 
+    if (code >= 71 && code <= 77) return "❄️"; 
+    if (code >= 95) return "⛈️";
+    return "❓";
+  };
   
   return (
   <div className="app">
+    <h1 className="title">Weather App</h1>
     <div className="card">
-      <h1 className="title">Weather App</h1>
 
       <div className="search">
         <input
@@ -82,14 +86,13 @@ const todayHours = weather
           °C / °F
         </button>
       </div>
-
       {weather && (
         <div className="hourly">
           {todayHours.map((hour, i) => (
             <div key={i} className="hour">
               <p>{formatHour(hour.time)}</p>
               <p>{convertTemp(hour.temp)}°{unit}</p>
-              <span>{getWeatherIcon(hour.code)}</span>
+              <span>{getWeatherIcon(hour.code, hour.time)}</span>
             </div>
           ))}
         </div>
