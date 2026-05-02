@@ -36,7 +36,6 @@ function App() {
 
       setWeather(weatherData);
       
-      // Determine day/night based on location's timezone
       if (weatherData && weatherData.timezone) {
         const localHour = getLocalHourInTimezone(weatherData.timezone);
         setIsDay(localHour >= 6 && localHour < 18);
@@ -58,6 +57,7 @@ const todayHours = weather
         wind: weather.hourly.windspeed_10m[index],
         dir: weather.hourly.winddirection_10m[index],
         prob: weather.hourly.precipitation_probability[index],
+        humidity: weather.hourly.relativehumidity_2m[index],
       }))
       .filter((hour) => hour.time.startsWith(today))
   : [];
@@ -130,6 +130,7 @@ const todayHours = weather
               <p>{convertTemp(hour.temp)}°{unit}</p>
               <span>{getWeatherIcon(hour.code, hour.time)}</span>
               <p>{convertWind(hour.wind)} {unit === 'C' ? 'km/h' : 'mph'} {getWindDir(hour.dir)}</p>
+              <p>Humidity: {hour.humidity}%</p>
               <p>Rain: {hour.prob}%</p>
             </div>
           ))}
