@@ -5,6 +5,15 @@ function App() {
   const [city, setCity] = useState("");
   const [weather, setWeather] = useState(null);
   const [unit, setUnit] = useState("C");
+  const [isDay, setIsDay] = useState(true);
+
+  // Helper function to get local hour in a timezone
+  const getLocalHourInTimezone = (timezone) => {
+    if (!timezone) return new Date().getHours();
+    const formatter = new Date().toLocaleString('en-US', { timeZone: timezone });
+    const localDate = new Date(formatter);
+    return localDate.getHours();
+  };
 
   const getWeather = async () => {
     try {
@@ -26,6 +35,12 @@ function App() {
       const weatherData = await weatherResponse.json();
 
       setWeather(weatherData);
+      
+      // Determine day/night based on location's timezone
+      if (weatherData && weatherData.timezone) {
+        const localHour = getLocalHourInTimezone(weatherData.timezone);
+        setIsDay(localHour >= 6 && localHour < 18);
+      }
     } catch (error) {
       console.error(error);
       alert("Error fetching weather");
@@ -60,19 +75,19 @@ const todayHours = weather
   };
 
   const getWeatherIcon = (code, timeString = null) => {
-    // Check if it's nighttime (between 6 PM and 6 AM)
+   
     const isNight = timeString ? (() => {
       const hour = new Date(timeString).getHours();
       return hour >= 18 || hour < 6;
     })() : false;
     
-    if (code === 0) return isNight ? "🌙" : "☀️"; // Clear sky: moon at night, sun during day
-    if (code <= 2) return isNight ? "☁️" : "🌤️"; // Mainly clear/partly cloudy: cloud at night, partly sunny during day
-    if (code === 3) return "☁️"; // Overcast
-    if (code >= 45 && code <= 48) return "🌫️"; // Fog
-    if (code >= 51 && code <= 67) return "🌧️"; // Rain
-    if (code >= 71 && code <= 77) return "❄️"; // Snow
-    if (code >= 95) return "⛈️"; // Thunderstorm
+    if (code === 0) return isNight ? "🌙" : "☀️"; 
+    if (code <= 2) return isNight ? "☁️" : "🌤️"; 
+    if (code === 3) return "☁️"; 
+    if (code >= 45 && code <= 48) return "🌫️"; 
+    if (code >= 51 && code <= 67) return "🌧️"; 
+    if (code >= 71 && code <= 77) return "❄️"; 
+    if (code >= 95) return "⛈️"; 
     return "❓";
   };
   const getWindDir = (deg) => {
@@ -88,7 +103,7 @@ const todayHours = weather
   })) : [];
   
   return (
-  <div className="app">
+  <div className={`app ${isDay ? 'day' : 'night'}`}>
     <div className="card">
       <h1 className="title">Weather App</h1>
 

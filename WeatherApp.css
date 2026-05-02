@@ -10,7 +10,10 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(135deg, #4facfe, #00f2fe);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  transition: background-image 0.5s ease;
 }
 
 
@@ -136,4 +139,17 @@ body {
 
 .wind {
   opacity: 0.8;
+}
+
+.app.day {
+  background-image: url('./DayTime.png');
+}
+
+.app.night {
+  background-image: url('./Nighttime.png');
+}
+
+.card {
+  position: relative;
+  z-index: 1;
 }
