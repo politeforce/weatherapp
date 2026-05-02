@@ -5,6 +5,15 @@ function App() {
   const [city, setCity] = useState("");
   const [weather, setWeather] = useState(null);
   const [unit, setUnit] = useState("C");
+  const [isDay, setIsDay] = useState(true);
+
+  // Helper function to get local hour in a timezone
+  const getLocalHourInTimezone = (timezone) => {
+    if (!timezone) return new Date().getHours();
+    const formatter = new Date().toLocaleString('en-US', { timeZone: timezone });
+    const localDate = new Date(formatter);
+    return localDate.getHours();
+  };
 
   const getWeather = async () => {
     try {
@@ -22,10 +31,15 @@ function App() {
 
       
       const weatherResponse = await fetch(
-        `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&hourly=temperature_2m,weathercode,windspeed_10m,winddirection_10m,precipitation_probability,relativehumidity_2m&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=auto`      );
+        `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&hourly=temperature_2m,weathercode,windspeed_10m,winddirection_10m,precipitation_probability&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=auto`      );
       const weatherData = await weatherResponse.json();
 
       setWeather(weatherData);
+      
+      if (weatherData && weatherData.timezone) {
+        const localHour = getLocalHourInTimezone(weatherData.timezone);
+        setIsDay(localHour >= 6 && localHour < 18);
+      }
     } catch (error) {
       console.error(error);
       alert("Error fetching weather");
@@ -60,16 +74,22 @@ const todayHours = weather
     return (h % 12 || 12) + (h >= 12 ? "PM" : "AM");
   };
 
-  const getWeatherIcon = (code) => {
-  if (code === 0) return "☀️"; 
-  if (code <= 2) return "🌤️"; 
-  if (code === 3) return "☁️"; 
-  if (code >= 45 && code <= 48) return "🌫️"; 
-  if (code >= 51 && code <= 67) return "🌧️"; 
-  if (code >= 71 && code <= 77) return "❄️"; 
-  if (code >= 95) return "⛈️";
-  return "❓";
-};
+  const getWeatherIcon = (code, timeString = null) => {
+   
+    const isNight = timeString ? (() => {
+      const hour = new Date(timeString).getHours();
+      return hour >= 18 || hour < 6;
+    })() : false;
+    
+    if (code === 0) return isNight ? "🌙" : "☀️"; 
+    if (code <= 2) return isNight ? "☁️" : "🌤️"; 
+    if (code === 3) return "☁️"; 
+    if (code >= 45 && code <= 48) return "🌫️"; 
+    if (code >= 51 && code <= 67) return "🌧️"; 
+    if (code >= 71 && code <= 77) return "❄️"; 
+    if (code >= 95) return "⛈️"; 
+    return "❓";
+  };
   const getWindDir = (deg) => {
     const directions = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
     const index = Math.round(deg / 22.5) % 16;
@@ -83,7 +103,7 @@ const todayHours = weather
   })) : [];
   
   return (
-  <div className="app">
+  <div className={`app ${isDay ? 'day' : 'night'}`}>
     <div className="card">
       <h1 className="title">Weather App</h1>
 
@@ -108,7 +128,7 @@ const todayHours = weather
             <div key={i} className="hour">
               <p>{formatHour(hour.time)}</p>
               <p>{convertTemp(hour.temp)}°{unit}</p>
-              <span>{getWeatherIcon(hour.code)}</span>
+              <span>{getWeatherIcon(hour.code, hour.time)}</span>
               <p>{convertWind(hour.wind)} {unit === 'C' ? 'km/h' : 'mph'} {getWindDir(hour.dir)}</p>
               <p>Humidity: {hour.humidity}%</p>
               <p>Rain: {hour.prob}%</p>
