@@ -22,7 +22,7 @@ body {
   backdrop-filter: blur(15px);
   padding: 30px;
   border-radius: 20px;
-  width: 350px;
+  width: 700px;
   text-align: center;
   color: white;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
@@ -65,22 +65,35 @@ body {
 .hourly {
   display: flex;
   overflow-x: auto;
-  gap: 10px;
-  padding: 10px;
+  gap: 14px;
+  padding: 14px;
 }
 
 .hour {
-  min-width: 70px;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 10px;
-  padding: 10px;
+  min-width: 110px;
+  max-width: 120px;
+  background: rgba(255, 255, 255, 0.22);
+  border-radius: 18px;
+  padding: 16px;
   text-align: center;
-  backdrop-filter: blur(5px);
-  transition: transform 0.2s;
+  backdrop-filter: blur(8px);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.hour p,
+.hour span {
+  margin: 8px 0 0;
+  line-height: 1.4;
+}
+
+.hour p:first-child,
+.hour span:first-child {
+  margin-top: 0;
 }
 
 .hour:hover {
-  transform: scale(1.1);
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
 }
 
 .weekly {
