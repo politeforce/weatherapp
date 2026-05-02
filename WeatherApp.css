@@ -79,6 +79,47 @@ body {
 .hour:hover {
   transform: scale(1.1);
 }
+
+.weekly {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.weekly h2 {
+  margin-bottom: 15px;
+  font-size: 18px;
+  text-align: center;
+}
+
+.day {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.day:last-child {
+  border-bottom: none;
+}
+
+.day-name {
+  flex: 1;
+  font-weight: 500;
+}
+
+.day-icon {
+  flex: 1;
+  text-align: center;
+  font-size: 20px;
+}
+
+.day-temps {
+  flex: 1;
+  text-align: right;
+  font-weight: 500;
+}
 .weather {
   margin-top: 10px;
 }
@@ -96,4 +137,3 @@ body {
 .wind {
   opacity: 0.8;
 }
-

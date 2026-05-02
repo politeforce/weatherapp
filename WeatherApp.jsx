@@ -22,10 +22,10 @@ function App() {
 
       
       const weatherResponse = await fetch(
-        `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&hourly=temperature_2m,weathercode,windspeed_10m,winddirection_10m&timezone=auto`      );
+        `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&hourly=temperature_2m,weathercode,windspeed_10m,winddirection_10m,precipitation_probability&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=auto`      );
       const weatherData = await weatherResponse.json();
 
-      setWeather(weatherData.hourly);
+      setWeather(weatherData);
     } catch (error) {
       console.error(error);
       alert("Error fetching weather");
@@ -35,13 +35,14 @@ function App() {
 const today = new Date().toISOString().split("T")[0];
 
 const todayHours = weather
-  ? weather.time
+  ? weather.hourly.time
       .map((time, index) => ({
         time,
-        temp: weather.temperature_2m[index],
-        code: weather.weathercode[index],
-        wind: weather.windspeed_10m[index],
-        dir: weather.winddirection_10m[index],
+        temp: weather.hourly.temperature_2m[index],
+        code: weather.hourly.weathercode[index],
+        wind: weather.hourly.windspeed_10m[index],
+        dir: weather.hourly.winddirection_10m[index],
+        prob: weather.hourly.precipitation_probability[index],
       }))
       .filter((hour) => hour.time.startsWith(today))
   : [];
@@ -58,21 +59,33 @@ const todayHours = weather
     return (h % 12 || 12) + (h >= 12 ? "PM" : "AM");
   };
 
-  const getWeatherIcon = (code) => {
-  if (code === 0) return "☀️"; 
-  if (code <= 2) return "🌤️"; 
-  if (code === 3) return "☁️"; 
-  if (code >= 45 && code <= 48) return "🌫️"; 
-  if (code >= 51 && code <= 67) return "🌧️"; 
-  if (code >= 71 && code <= 77) return "❄️"; 
-  if (code >= 95) return "⛈️";
-  return "❓";
-};
+  const getWeatherIcon = (code, timeString = null) => {
+    // Check if it's nighttime (between 6 PM and 6 AM)
+    const isNight = timeString ? (() => {
+      const hour = new Date(timeString).getHours();
+      return hour >= 18 || hour < 6;
+    })() : false;
+    
+    if (code === 0) return isNight ? "🌙" : "☀️"; // Clear sky: moon at night, sun during day
+    if (code <= 2) return isNight ? "☁️" : "🌤️"; // Mainly clear/partly cloudy: cloud at night, partly sunny during day
+    if (code === 3) return "☁️"; // Overcast
+    if (code >= 45 && code <= 48) return "🌫️"; // Fog
+    if (code >= 51 && code <= 67) return "🌧️"; // Rain
+    if (code >= 71 && code <= 77) return "❄️"; // Snow
+    if (code >= 95) return "⛈️"; // Thunderstorm
+    return "❓";
+  };
   const getWindDir = (deg) => {
     const directions = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
     const index = Math.round(deg / 22.5) % 16;
     return directions[index];
   };
+  const weeklyDays = weather ? weather.daily.time.map((time, index) => ({
+    time,
+    max: weather.daily.temperature_2m_max[index],
+    min: weather.daily.temperature_2m_min[index],
+    code: weather.daily.weathercode[index],
+  })) : [];
   
   return (
   <div className="app">
@@ -100,8 +113,22 @@ const todayHours = weather
             <div key={i} className="hour">
               <p>{formatHour(hour.time)}</p>
               <p>{convertTemp(hour.temp)}°{unit}</p>
-              <span>{getWeatherIcon(hour.code)}</span>
+              <span>{getWeatherIcon(hour.code, hour.time)}</span>
               <p>{convertWind(hour.wind)} {unit === 'C' ? 'km/h' : 'mph'} {getWindDir(hour.dir)}</p>
+              <p>Rain: {hour.prob}%</p>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {weather && (
+        <div className="weekly">
+          <h2>10-Day Forecast</h2>
+          {weeklyDays.map((day, i) => (
+            <div key={i} className="day">
+              <span className="day-name">{i === 0 ? 'Today' : new Date(day.time).toLocaleDateString('en-US', { weekday: 'short' })}</span>
+              <span className="day-icon">{getWeatherIcon(day.code)}</span>
+              <span className="day-temps">{convertTemp(day.min)}° - {convertTemp(day.max)}°</span>
             </div>
           ))}
         </div>
